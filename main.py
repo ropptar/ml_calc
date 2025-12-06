@@ -1,11 +1,13 @@
 import tkinter as tk
 import numpy as np
-
+import pickle
 
 class PixelEditor:
-    def __init__(self):
+    def __init__(self, model_path: str):
         self.root = tk.Tk()
         self.root.title("28x28 Pixel Editor")
+        with open(model_path, 'rb') as f:
+            self.model = pickle.load(f)
 
         # Инициализация массива пикселей (28x28)
         self.pixels = np.zeros((28, 28), dtype=np.uint8)
@@ -19,6 +21,7 @@ class PixelEditor:
         # Кнопки управления
         tk.Button(self.root, text="Clear", command=self.clear).pack(side=tk.LEFT)
         tk.Button(self.root, text="Print", command=self.print_pixels).pack(side=tk.RIGHT)
+        tk.Button(self.root, text="Predict", command=self.predict).pack(side=tk.RIGHT)
 
         # Привязка событий мыши
         self.canvas.bind("<B1-Motion>", self.draw)
@@ -45,5 +48,8 @@ class PixelEditor:
         for row in self.pixels:
             print(" ".join(f"{val:1d}" for val in row))
 
-app = PixelEditor()
+    def predict(self):
+        print(self.model.predict(self.pixels.reshape(1,-1)))
+
+app = PixelEditor('number_recognition_model.pkl')
 app.root.mainloop()
